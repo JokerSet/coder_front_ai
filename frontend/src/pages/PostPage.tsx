@@ -42,7 +42,6 @@ export default function PostPage() {
     setLoading(true);
     try {
       const res = await contentApi.replies(postId, { page: p, limit: LIMIT });
-	  console.log(res);
       setReplies(res.data ? res.data : []);
       setMeta(res.meta);
     } catch {

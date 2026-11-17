@@ -66,6 +66,11 @@ Headers: {authorization: Bearer token}
 Param: {contentId: string}
 Response: void
 
+GET /content/unlike/:contentId
+Headers: {authorization: Bearer token}
+Param: {contentId: string}
+Response: void
+
 GET /content/liked/:contentId
 Headers: {authorization: Bearer token}
 Param: {contentId: string}
