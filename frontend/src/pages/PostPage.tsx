@@ -21,19 +21,29 @@ export default function PostPage() {
   const [text, setText] = useState('');
 
   useEffect(() => {
-    if (!postId) return;
-    contentApi
-      .getById(postId)
-      .then(setPost)
-      .catch(() => setError('Запись не найдена.'));
+    void loadPost(postId);
   }, [postId]);
+
+	const loadPost = useCallback(async (id: string)=>{
+		if (!id) return;
+		setLoading(true);
+		try {
+		  const res = await contentApi.getById(id);
+		  setPost(res.data);
+		} catch {
+		  setError('Запись не найдена.')
+		} finally {
+		  setLoading(false);
+		}
+	}, [postId])
 
   const loadReplies = useCallback(async (p: number) => {
     if (!postId) return;
     setLoading(true);
     try {
       const res = await contentApi.replies(postId, { page: p, limit: LIMIT });
-      setReplies(res.data);
+	  console.log(res);
+      setReplies(res.data ? res.data : []);
       setMeta(res.meta);
     } catch {
       /* replies may be empty */
@@ -98,7 +108,7 @@ export default function PostPage() {
       <h2 className="section-title">Ответы ({post.repliesCount})</h2>
       {loading ? (
         <p className="hint">Загрузка…</p>
-      ) : replies.length === 0 ? (
+      ) : (!replies || replies.length === 0) ? (
         <p className="hint">Ответов пока нет. Будьте первым!</p>
       ) : (
         replies.map((r) => <PostCard key={r.id} post={r} />)
