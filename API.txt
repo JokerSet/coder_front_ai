@@ -1,0 +1,72 @@
+POST /auth/login 
+Body: {login: string, password: string} 
+Response: {
+	tokens:{refreshToken: string, accessToken: string}, 
+	user: { id: string, login: string, username: string, role: string}
+}
+
+POST /auth/register
+Body: {login: string, password: string, username: string} 
+Response: {
+	tokens:{refreshToken: string, accessToken: string}, 
+	user: { id: string, login: string, username: string, role: string}
+}
+
+POST /auth/refresh
+Body: {refreshToken: string},
+Response: {refreshToken: string, accessToken: string}
+
+GET /auth/logout
+Headers: {authorization: Bearer token}
+Response: void
+
+GET /auth
+Headers: {authorization: Bearer token}
+Response: {id: string, login: string, username: string, role: string}
+
+GET /content
+Query: {page: number, limit: number}
+Response: {
+	data: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number},
+	meta: { totalItems: number, itemCount: number, itemsPerPage: number, totalPages: number, currentPage: number}
+}
+
+GET /content/byUser/:userId
+Query: {page: number, limit: number}
+Param: {userId: string}
+Response: {
+	data: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number},
+	meta: { totalItems: number, itemCount: number, itemsPerPage: number, totalPages: number, currentPage: number}
+}
+
+GET /content/replies/:parentId
+Query: {page: number, limit: number}
+Param: {parentId: string}
+Response: {
+	data: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number},
+	meta: { totalItems: number, itemCount: number, itemsPerPage: number, totalPages: number, currentPage: number}
+}
+
+GET /content/id/:contentId
+Param: {contentId: string}
+Response: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}
+
+POST /content/create
+Headers: {authorization: Bearer token}
+Body: {text: string}
+Response: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}
+
+POST /content/replie
+Headers: {authorization: Bearer token}
+Body: {text: string, parentId: string}
+Response: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}
+
+GET /content/like/:contentId
+Headers: {authorization: Bearer token}
+Param: {contentId: string}
+Response: void
+
+GET /content/liked/:contentId
+Headers: {authorization: Bearer token}
+Param: {contentId: string}
+Response: {response:boolean}
