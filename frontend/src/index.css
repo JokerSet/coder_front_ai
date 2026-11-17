@@ -1,0 +1,187 @@
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #14171a;
+  --muted: #657786;
+  --primary: #1d9bf0;
+  --primary-dark: #1a8cd8;
+  --danger: #e0245e;
+  --border: #e6ecf0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.nav { display: flex; align-items: center; gap: 1rem; }
+.nav a { color: var(--text); text-decoration: none; }
+.nav a:hover { color: var(--primary); }
+
+.main {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+  flex: 1;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.9rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.author {
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text);
+}
+.author:hover { text-decoration: underline; }
+
+.login { color: var(--muted); font-weight: 400; margin-left: 0.35rem; }
+
+.badge {
+  font-size: 0.7rem;
+  background: #e8f5fd;
+  color: var(--primary);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.card-text {
+  display: block;
+  color: var(--text);
+  text-decoration: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  padding: 0.45rem 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+.btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+.btn-outline:hover:not(:disabled) { background: #e8f5fd; }
+.btn-ghost { background: transparent; color: var(--muted); }
+.btn-ghost:hover:not(:disabled) { color: var(--danger); background: #fce8ee; }
+.btn-ghost.liked { color: var(--danger); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.composer textarea {
+  width: 100%;
+  border: none;
+  resize: vertical;
+  font: inherit;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+}
+
+.composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.hint { color: var(--muted); font-size: 0.875rem; }
+.error { color: var(--danger); font-size: 0.9rem; }
+
+.auth-page { display: flex; justify-content: center; padding-top: 2rem; }
+.auth-card { width: 100%; max-width: 400px; }
+.auth-card h1 { margin-top: 0; }
+
+.auth-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin-bottom: 0.9rem;
+}
+
+.auth-card input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font: inherit;
+  color: var(--text);
+  outline: none;
+}
+.auth-card input:focus { border-color: var(--primary); }
+
+.auth-card .btn { justify-content: center; }
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  color: var(--primary);
+  text-decoration: none;
+}
+.back-link:hover { text-decoration: underline; }
+
+.section-title { font-size: 1.05rem; margin: 1.25rem 0 0.75rem; }
+
+.profile-header h1 { margin: 0; font-size: 1.2rem; }
