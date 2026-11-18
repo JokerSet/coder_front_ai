@@ -2,24 +2,50 @@ import { useCallback, useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { contentApi } from '../api/content';
+import { userApi } from '../api/user';
 import PostCard from '../components/PostCard';
+import UserCard from '../components/UserCard';
 import Pagination from '../components/Pagination';
 import { useAuth } from '../context/AuthContext';
-import type { Content, PageMeta } from '../types';
+import type { Content, PageMeta, UserProfile } from '../types';
 
 const LIMIT = 20;
+
+type Tab = 'posts' | 'followers' | 'followings';
 
 export default function ProfilePage() {
   const { userId } = useParams<{ userId: string }>();
   const { user } = useAuth();
+  const [tab, setTab] = useState<Tab>('posts');
+
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [posts, setPosts] = useState<Content[]>([]);
+  const [people, setPeople] = useState<UserProfile[]>([]);
   const [meta, setMeta] = useState<PageMeta | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [text, setText] = useState('');
+  const [busyFollow, setBusyFollow] = useState(false);
+  const [followed, setFollowed] = useState(false);
 
-  const load = useCallback(async (p: number) => {
+  const isSelf = user?.id === userId;
+
+  useEffect(() => {
+    setFollowed(false);
+  }, [userId]);
+
+  // Данные пользователя (user-сервис)
+  useEffect(() => {
+    if (!userId) return;
+    userApi
+      .getById(userId)
+      .then(setProfile)
+      .catch(() => setError('Не удалось загрузить профиль пользователя.'));
+  }, [userId]);
+
+  // Записи пользователя (content-сервис)
+  const loadPosts = useCallback(async (p: number) => {
     if (!userId) return;
     setLoading(true);
     setError('');
@@ -34,14 +60,40 @@ export default function ProfilePage() {
     }
   }, [userId]);
 
+  // Подписчики / подписки (user-сервис)
+  const loadPeople = useCallback(
+    async (p: number) => {
+      if (!userId) return;
+      setLoading(true);
+      setError('');
+      try {
+        const api = tab === 'followers' ? userApi.followers : userApi.followings;
+        const res = await api(userId, { page: p, limit: LIMIT });
+        setPeople(res.data);
+        setMeta(res.meta);
+      } catch {
+        setError('Не удалось загрузить список.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [userId, tab],
+  );
+
   useEffect(() => {
-    void load(page);
-  }, [page, load]);
+    if (tab === 'posts') void loadPosts(page);
+    else void loadPeople(page);
+  }, [page, tab, loadPosts, loadPeople]);
+
+  const changeTab = (t: Tab) => {
+    setTab(t);
+    setPage(1);
+  };
 
   const submitPost = async (e: FormEvent) => {
     e.preventDefault();
     const trimmed = text.trim();
-    if (!trimmed || !userId) return;
+    if (!trimmed) return;
     try {
       const created = await contentApi.create(trimmed);
       setText('');
@@ -51,15 +103,75 @@ export default function ProfilePage() {
     }
   };
 
-  const isSelf = user?.id === userId;
+  const handleFollowToggle = async () => {
+    if (!user || !userId || busyFollow || isSelf) return;
+    setBusyFollow(true);
+    try {
+      if (followed) {
+        await userApi.unfollow(userId);
+        setProfile((prev) =>
+          prev ? { ...prev, followersCount: prev.followersCount - 1 } : prev,
+        );
+        setFollowed(false);
+      } else {
+        await userApi.follow(userId);
+        setProfile((prev) =>
+          prev ? { ...prev, followersCount: prev.followersCount + 1 } : prev,
+        );
+        setFollowed(true);
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      setBusyFollow(false);
+    }
+  };
 
   return (
     <div className="feed">
       <div className="card profile-header">
-        <h1>{isSelf ? 'Мой профиль' : `Профиль @${userId}`}</h1>
+        <div className="profile-top">
+          <h1>
+            {profile ? profile.username : isSelf ? 'Мой профиль' : `Профиль @${userId}`}
+            {profile && <span className="login">@{profile.login}</span>}
+          </h1>
+          {user && !isSelf && (
+            <button
+              className={`btn ${followed ? 'btn-outline' : 'btn-primary'}`}
+              onClick={handleFollowToggle}
+              disabled={busyFollow}
+            >
+              {followed ? 'Отписаться' : 'Подписаться'}
+            </button>
+          )}
+        </div>
+        {profile && (
+          <div className="profile-stats hint">
+            <span>Записей: {tab === 'posts' && meta ? meta.totalItems : '—'}</span>
+            <button className="link-btn" onClick={() => changeTab('followings')}>
+              Подписки: {profile.followingCount}
+            </button>
+            <button className="link-btn" onClick={() => changeTab('followers')}>
+              Подписчики: {profile.followersCount}
+            </button>
+          </div>
+        )}
+        {profile?.role && <span className="badge">{profile.role}</span>}
       </div>
 
-      {isSelf && (
+      <div className="tabs">
+        <button className={`tab ${tab === 'posts' ? 'active' : ''}`} onClick={() => changeTab('posts')}>
+          Записи
+        </button>
+        <button className={`tab ${tab === 'followers' ? 'active' : ''}`} onClick={() => changeTab('followers')}>
+          Подписчики
+        </button>
+        <button className={`tab ${tab === 'followings' ? 'active' : ''}`} onClick={() => changeTab('followings')}>
+          Подписки
+        </button>
+      </div>
+
+      {isSelf && tab === 'posts' && (
         <form className="card composer" onSubmit={submitPost}>
           <textarea
             value={text}
@@ -80,10 +192,18 @@ export default function ProfilePage() {
       {error && <p className="error">{error}</p>}
       {loading ? (
         <p className="hint">Загрузка…</p>
-      ) : posts.length === 0 ? (
-        <p className="hint">У пользователя пока нет записей.</p>
+      ) : tab === 'posts' ? (
+        posts.length === 0 ? (
+          <p className="hint">У пользователя пока нет записей.</p>
+        ) : (
+          posts.map((p) => <PostCard key={p.id} post={p} />)
+        )
+      ) : people.length === 0 ? (
+        <p className="hint">
+          {tab === 'followers' ? 'Подписчиков пока нет.' : 'Подписок пока нет.'}
+        </p>
       ) : (
-        posts.map((p) => <PostCard key={p.id} post={p} />)
+        people.map((u) => <UserCard key={u.id} profile={u} />)
       )}
 
       {meta && <Pagination meta={meta} onPage={setPage} />}

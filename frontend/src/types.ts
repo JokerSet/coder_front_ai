@@ -35,3 +35,14 @@ export interface PagedContent {
   data: Content[];
   meta: PageMeta;
 }
+
+/** Пользователь из user-сервиса (с счётчиками подписок) */
+export interface UserProfile extends User {
+  followingCount: number;
+  followersCount: number;
+}
+
+export interface PagedUsers {
+  data: UserProfile[];
+  meta: PageMeta;
+}

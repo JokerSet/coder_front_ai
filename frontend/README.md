@@ -1,6 +1,6 @@
 # Chirp — фронтенд (React + TypeScript + Vite)
 
-SPA-клиент для микросервисного NestJS API (сервис авторизации + сервис контента, JWT).
+SPA-клиент для микросервисного NestJS API (сервис авторизации + сервис контента + сервис пользователей, JWT).
 Реализованы все маршруты из `API.txt`.
 
 ## Стек
@@ -30,14 +30,16 @@ npm run dev            # http://localhost:5173
 ```
 src/
   api/
-    client.ts      # axios-клиенты auth/content, Bearer-заголовок, авто-refresh токенов (401 -> /auth/refresh)
+    client.ts      # axios-клиенты auth/content/user, Bearer-заголовок, авто-refresh токенов (401 -> /auth/refresh)
     auth.ts        # POST /auth/login, /auth/register, GET /auth/logout, GET /auth
     content.ts     # GET /content, /content/byUser/:id, /content/replies/:id, /content/id/:id,
-                   # POST /content/create, /content/replie, GET /content/like/:id, /content/liked/:id
+                   # POST /content/create, /content/replie, GET /content/like/:id, /content/unlike/:id, /content/liked/:id
+    user.ts        # GET /user, /id/:userId, /followers/:userId, /followings/:userId, /follow/:userId, /unfollow/:userId
   context/AuthContext.tsx  # состояние пользователя, login/register/logout
-  components/      # Layout, ProtectedRoute, PostCard (лайки/ответы), Pagination
-  pages/           # FeedPage (лента), LoginPage, RegisterPage, ProfilePage, PostPage (пост + ответы)
-  types.ts         # User, Tokens, Content, PagedContent, PageMeta
+  components/      # Layout, ProtectedRoute, PostCard (лайки/ответы), UserCard (подписки), Pagination
+  pages/           # FeedPage (лента), LoginPage, RegisterPage, ProfilePage (записи/подписчики/подписки),
+                   # PostPage (пост + ответы), UsersPage (список пользователей)
+  types.ts         # User, UserProfile, Tokens, Content, PagedContent, PagedUsers, PageMeta
 ```
 
 ## Соответствие маршрутам API
@@ -55,8 +57,20 @@ src/
 | GET /content/id/:contentId | страница поста |
 | POST /content/create | форма «Что нового?» (лента/профиль) |
 | POST /content/replie | форма ответа под постом |
-| GET /content/like/:contentId | кнопка ♥ |
+| GET /content/like/:contentId | кнопка ♥ (лайк) |
+| GET /content/unlike/:contentId | кнопка ♥ (снятие лайка, повторное нажатие) |
 | GET /content/liked/:contentId | подсветка уже поставленного лайка |
+| GET /user | страница «Люди» (`/users`) с пагинацией |
+| GET /id/:userId | шапка профиля (имя, логины, счётчики подписок) |
+| GET /followers/:userId | вкладка «Подписчики» в профиле |
+| GET /followings/:userId | вкладка «Подписки» в профиле |
+| GET /follow/:userId | кнопка «Подписаться» |
+| GET /unfollow/:userId | кнопка «Отписаться» |
+
+> Примечание: маршруты user-сервиса в `API.txt` описаны без префикса (`/user`, `/id/:userId`,
+> `/followers/:userId` и т.д.), поэтому `userClient` в `api/client.ts` использует базовый URL
+> без суффикса. Если через gateway пользовательский сервис монтируется по префиксу `/user`,
+> достаточно поменять `baseURL` у `userClient` и пути внутри `api/user.ts`.
 
 ## JWT
 - `accessToken`/`refreshToken` хранятся в `localStorage`.

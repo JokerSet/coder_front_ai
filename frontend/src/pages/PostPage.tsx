@@ -24,12 +24,12 @@ export default function PostPage() {
     void loadPost(postId);
   }, [postId]);
 
-	const loadPost = useCallback(async (id: string)=>{
+	const loadPost = useCallback(async (id?: string)=>{
 		if (!id) return;
 		setLoading(true);
 		try {
 		  const res = await contentApi.getById(id);
-		  setPost(res.data);
+		  setPost(res);
 		} catch {
 		  setError('Запись не найдена.')
 		} finally {

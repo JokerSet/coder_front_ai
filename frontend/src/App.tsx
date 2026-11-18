@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import PostPage from './pages/PostPage';
+import UsersPage from './pages/UsersPage';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/post/:postId" element={<PostPage />} />
+            <Route path="/users" element={<UsersPage />} />
             <Route
               path="/profile/:userId"
               element={

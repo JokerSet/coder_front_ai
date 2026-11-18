@@ -16,6 +16,10 @@ export default function PostCard({ post, onChanged }: Props) {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    setLikes(post.likeCount);
+  }, [post.likeCount]);
+
+  useEffect(() => {
     if (!user) return;
     contentApi
       .isLiked(post.id)
@@ -27,7 +31,11 @@ export default function PostCard({ post, onChanged }: Props) {
     if (!user || busy) return;
     setBusy(true);
     try {
-      await contentApi.like(post.id);
+      if (liked) {
+        await contentApi.unlike(post.id);
+      } else {
+        await contentApi.like(post.id);
+      }
       const next = !liked;
       setLiked(next);
       setLikes((c) => c + (next ? 1 : -1));

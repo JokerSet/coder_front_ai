@@ -22,9 +22,10 @@ export const contentApi = {
     return data;
   },
 
+  /** Ответ на определённый пост: Response: {data:{...}} */
   getById: async (contentId: string): Promise<Content> => {
     const { data } = await contentClient.get(`/id/${contentId}`);
-    return data;
+    return data.data;
   },
 
   create: async (text: string): Promise<Content> => {
@@ -39,6 +40,10 @@ export const contentApi = {
 
   like: async (contentId: string): Promise<void> => {
     await contentClient.get(`/like/${contentId}`);
+  },
+
+  unlike: async (contentId: string): Promise<void> => {
+    await contentClient.get(`/unlike/${contentId}`);
   },
 
   isLiked: async (contentId: string): Promise<boolean> => {

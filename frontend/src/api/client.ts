@@ -8,6 +8,11 @@ export const authClient = axios.create({ baseURL: `${API_URL}/auth` });
 /** Content service (separate microservice) */
 export const contentClient = axios.create({ baseURL: `${API_URL}/content` });
 
+/** User service (separate microservice).
+ *  Часть маршрутов описана без префикса (/id/:userId, /followers/:userId и т.д.),
+ *  поэтому запросы к нему идут от корня API. */
+export const userClient = axios.create({ baseURL: API_URL });
+
 let onUnauthorized: (() => void) | null = null;
 export function setOnUnauthorized(cb: () => void) {
   onUnauthorized = cb;
@@ -58,3 +63,4 @@ function attachInterceptors(client: typeof authClient) {
 
 attachInterceptors(authClient);
 attachInterceptors(contentClient);
+attachInterceptors(userClient);

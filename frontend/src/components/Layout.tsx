@@ -17,11 +17,13 @@ export default function Layout() {
         <nav className="nav">
           {user ? (
             <>
+              <Link to="/users">Люди</Link>
               <Link to={`/profile/${user.id}`}>@{user.username}</Link>
               <button className="btn btn-outline" onClick={handleLogout}>Выйти</button>
             </>
           ) : (
             <>
+              <Link to="/users">Люди</Link>
               <Link to="/login">Войти</Link>
               <Link to="/register" className="btn btn-primary">Регистрация</Link>
             </>
