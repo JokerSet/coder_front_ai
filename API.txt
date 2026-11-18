@@ -1,3 +1,6 @@
+//Запросы авторизации:
+
+//Запрос на логин пользователя
 POST /auth/login 
 Body: {login: string, password: string} 
 Response: {
@@ -5,6 +8,7 @@ Response: {
 	user: { id: string, login: string, username: string, role: string}
 }
 
+//Запрос на регистрацию пользователя
 POST /auth/register
 Body: {login: string, password: string, username: string} 
 Response: {
@@ -12,66 +16,125 @@ Response: {
 	user: { id: string, login: string, username: string, role: string}
 }
 
+//Запрос на обновления токена jwt
 POST /auth/refresh
 Body: {refreshToken: string},
 Response: {refreshToken: string, accessToken: string}
 
+//Запрос на разлогин пользователя
 GET /auth/logout
 Headers: {authorization: Bearer token}
 Response: void
 
+//Запрос на авторизацию пользователя по токену jwt
 GET /auth
 Headers: {authorization: Bearer token}
 Response: {id: string, login: string, username: string, role: string}
 
+//Запросы контента:
+
+//Запрос на список постов
 GET /content
 Query: {page: number, limit: number}
 Response: {
-	data: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number},
+	data: [{id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}],
 	meta: { totalItems: number, itemCount: number, itemsPerPage: number, totalPages: number, currentPage: number}
 }
 
+//Запрос постов пользователя
 GET /content/byUser/:userId
 Query: {page: number, limit: number}
 Param: {userId: string}
 Response: {
-	data: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number},
+	data: [{id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}],
 	meta: { totalItems: number, itemCount: number, itemsPerPage: number, totalPages: number, currentPage: number}
 }
 
+//Запрос ответов на пост 
 GET /content/replies/:parentId
 Query: {page: number, limit: number}
 Param: {parentId: string}
 Response: {
-	data: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number},
+	data: [{id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}],
 	meta: { totalItems: number, itemCount: number, itemsPerPage: number, totalPages: number, currentPage: number}
 }
 
+//Запрос ответов на определённый пост
 GET /content/id/:contentId
 Param: {contentId: string}
-Response: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}
+Response: {data:{id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}}
 
+//Запрос на создание поста
 POST /content/create
 Headers: {authorization: Bearer token}
 Body: {text: string}
 Response: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}
 
+//Запрос на создание ответа на пост
 POST /content/replie
 Headers: {authorization: Bearer token}
 Body: {text: string, parentId: string}
 Response: {id: string, author: { id: string, login: string, username: string, role: string }, text: string likeCount: number, repliesCount: number}
 
+//Запрос на лайк поста
 GET /content/like/:contentId
 Headers: {authorization: Bearer token}
 Param: {contentId: string}
 Response: void
 
+//Запрос на убрать лайк с поста
 GET /content/unlike/:contentId
 Headers: {authorization: Bearer token}
 Param: {contentId: string}
 Response: void
 
+//Запрос проверка нравиться ли пользователю пост
 GET /content/liked/:contentId
 Headers: {authorization: Bearer token}
 Param: {contentId: string}
 Response: {response:boolean}
+
+//Запросы пользователи:
+
+//Запросы на список пользователей
+GET /user
+Query: {page: number, limit: number}
+Response: {
+	data: [{id: string, login: string, username: string, role: string, followingCount: number, followersCount: number}],
+	meta: { totalItems: number, itemCount: number, itemsPerPage: number, totalPages: number, currentPage: number}
+}
+
+//Запрос на данные определённого пользователя
+GET /id/:userId
+Param: {userId: string}
+Response: {data:{id: string, login: string, username: string, role: string, followingCount: number, followersCount: number}}
+
+//Запрос на список подписчиков пользователя
+GET /followers/:userId
+Query: {page: number, limit: number}
+Param: {userId: string}
+Response: {
+	data: [{id: string, login: string, username: string, role: string, followingCount: number, followersCount: number}],
+	meta: { totalItems: number, itemCount: number, itemsPerPage: number, totalPages: number, currentPage: number}
+}
+
+//Запрос на список подписок пользователя
+GET /followings/:userId
+Query: {page: number, limit: number}
+Param: {userId: string}
+Response: {
+	data: [{id: string, login: string, username: string, role: string, followingCount: number, followersCount: number}],
+	meta: { totalItems: number, itemCount: number, itemsPerPage: number, totalPages: number, currentPage: number}
+}
+
+//Запрос на подписку на пользователя
+GET /follow/:userId
+Headers: {authorization: Bearer token}
+Param: {userId: string}
+Response: void
+
+//Запрос на отписку на пользователя
+GET /unfollow/:userId
+Headers: {authorization: Bearer token}
+Param: {userId: string}
+Response: void
