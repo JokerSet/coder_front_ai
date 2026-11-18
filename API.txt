@@ -105,12 +105,12 @@ Response: {
 }
 
 //Запрос на данные определённого пользователя
-GET /id/:userId
+GET /user/id/:userId
 Param: {userId: string}
 Response: {data:{id: string, login: string, username: string, role: string, followingCount: number, followersCount: number}}
 
 //Запрос на список подписчиков пользователя
-GET /followers/:userId
+GET /user/followers/:userId
 Query: {page: number, limit: number}
 Param: {userId: string}
 Response: {
@@ -119,7 +119,7 @@ Response: {
 }
 
 //Запрос на список подписок пользователя
-GET /followings/:userId
+GET /user/followings/:userId
 Query: {page: number, limit: number}
 Param: {userId: string}
 Response: {
@@ -128,13 +128,19 @@ Response: {
 }
 
 //Запрос на подписку на пользователя
-GET /follow/:userId
+GET /user/follow/:userId
 Headers: {authorization: Bearer token}
 Param: {userId: string}
 Response: void
 
 //Запрос на отписку на пользователя
-GET /unfollow/:userId
+GET /user/unfollow/:userId
 Headers: {authorization: Bearer token}
 Param: {userId: string}
 Response: void
+
+//Запрос проверка подписан ли пользователь
+GET /user/following/:userId
+Headers: {authorization: Bearer token}
+Param: {userId: string}
+Response: {response:boolean}
