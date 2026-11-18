@@ -37,7 +37,7 @@ export default function UsersPage() {
       {error && <p className="error">{error}</p>}
       {loading ? (
         <p className="hint">Загрузка…</p>
-      ) : users.length === 0 ? (
+      ) : (!users || users.length === 0) ? (
         <p className="hint">Пользователей пока нет.</p>
       ) : (
         users.map((u) => <UserCard key={u.id} profile={u} />)

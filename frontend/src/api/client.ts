@@ -11,7 +11,7 @@ export const contentClient = axios.create({ baseURL: `${API_URL}/content` });
 /** User service (separate microservice).
  *  Часть маршрутов описана без префикса (/id/:userId, /followers/:userId и т.д.),
  *  поэтому запросы к нему идут от корня API. */
-export const userClient = axios.create({ baseURL: API_URL });
+export const userClient = axios.create({ baseURL: `${API_URL}/user` });
 
 let onUnauthorized: (() => void) | null = null;
 export function setOnUnauthorized(cb: () => void) {

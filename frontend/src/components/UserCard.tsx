@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { UserProfile } from '../types';
@@ -26,12 +26,10 @@ export default function UserCard({ profile, action }: Props) {
       if (isFollowing) {
         await userApi.unfollow(profile.id);
         setFollowers((c) => c - 1);
-        if (user) setFollowing((c) => c - 1);
         setIsFollowing(false);
       } else {
         await userApi.follow(profile.id);
         setFollowers((c) => c + 1);
-        if (user) setFollowing((c) => c + 1);
         setIsFollowing(true);
       }
     } catch {
@@ -40,6 +38,15 @@ export default function UserCard({ profile, action }: Props) {
       setBusy(false);
     }
   };
+  
+  useEffect(() => {
+    if (!user) return;
+	if (isSelf) return;
+    userApi
+      .isFollowing(profile.id)
+      .then(setIsFollowing)
+      .catch(() => setIsFollowing(false));
+  }, [profile]);
 
   return (
     <article className="card user-card">

@@ -9,7 +9,7 @@ export interface PageParams {
 export const userApi = {
   /** Список пользователей */
   list: async ({ page, limit }: PageParams): Promise<PagedUsers> => {
-    const { data } = await userClient.get('/user', { params: { page, limit } });
+    const { data } = await userClient.get('/', { params: { page, limit } });
     return data;
   },
 
@@ -39,5 +39,11 @@ export const userApi = {
   /** Отписаться от пользователя */
   unfollow: async (userId: string): Promise<void> => {
     await userClient.get(`/unfollow/${userId}`);
+  },
+  
+  /** проверка подаисан ли на пользователя */
+  isFollowing: async (userId: string): Promise<boolean> => {
+    const { data } = await userClient.get(`/following/${userId}`);
+    return data.response;
   },
 };

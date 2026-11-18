@@ -31,10 +31,6 @@ export default function ProfilePage() {
 
   const isSelf = user?.id === userId;
 
-  useEffect(() => {
-    setFollowed(false);
-  }, [userId]);
-
   // Данные пользователя (user-сервис)
   useEffect(() => {
     if (!userId) return;
@@ -42,6 +38,15 @@ export default function ProfilePage() {
       .getById(userId)
       .then(setProfile)
       .catch(() => setError('Не удалось загрузить профиль пользователя.'));
+  }, [userId]);
+  
+  
+  useEffect(() => {
+	if(isSelf) return;
+	userApi
+      .isFollowing(userId)
+      .then(setFollowed)
+      .catch(() => setFollowed(false));
   }, [userId]);
 
   // Записи пользователя (content-сервис)
@@ -193,12 +198,12 @@ export default function ProfilePage() {
       {loading ? (
         <p className="hint">Загрузка…</p>
       ) : tab === 'posts' ? (
-        posts.length === 0 ? (
+        (!posts || posts.length === 0) ? (
           <p className="hint">У пользователя пока нет записей.</p>
         ) : (
           posts.map((p) => <PostCard key={p.id} post={p} />)
         )
-      ) : people.length === 0 ? (
+      ) : (!people || people.length === 0) ? (
         <p className="hint">
           {tab === 'followers' ? 'Подписчиков пока нет.' : 'Подписок пока нет.'}
         </p>
